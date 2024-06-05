@@ -1,0 +1,594 @@
+---
+title: "REPORT"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+date: "2024-06-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,message = F,warning = F)
+```
+
+```{r}
+library(readr)
+library(magrittr)
+library(dplyr)
+```
+```{r}
+hospital <- read_csv("HMGT400HOSPITAL2.csv")
+```
+
+Summary Statistics
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Load your dataset
+# hospital <- read.csv("your_dataset.csv")
+
+# Calculate descriptive statistics for each characteristic
+mean_statistics <- hospital %>%
+  group_by(year) %>%
+  summarise(
+    mean_hospital_beds = mean(hospital_beds, na.rm = TRUE),
+    mean_paid_employees = mean(total_hospital_employees_on_payr, na.rm = TRUE),
+    mean_non_paid_employees = mean(total_hospital_non_paid_workers, na.rm = TRUE),
+    mean_total_cost = mean(total_hosp_cost, na.rm = TRUE),
+    mean_total_revenues = mean(total_hosp_revenue, na.rm = TRUE),
+    mean_medicare_days = mean(total_hospital_medicare_days, na.rm = TRUE),
+    mean_medicaid_days = mean(total_hospital_medicaid_days, na.rm = TRUE),
+    mean_total_discharge = mean(total_hospital_discharges, na.rm = TRUE),
+    mean_medicare_discharge = mean(total_hospital_discharges, na.rm = TRUE),
+    mean_medicaid_discharge = mean(total_hospital_medicaid_discharg, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+sd_statistics <- hospital %>%
+  group_by(year) %>%
+  summarise(
+    sd_hospital_beds = sd(hospital_beds, na.rm = TRUE),
+    sd_paid_employees = sd(total_hospital_employees_on_payr, na.rm = TRUE),
+    sd_non_paid_employees = sd(total_hospital_non_paid_workers, na.rm = TRUE),
+    sd_total_cost = sd(total_hosp_cost, na.rm = TRUE),
+    sd_total_revenues = sd(total_hosp_revenue, na.rm = TRUE),
+    sd_medicare_days = sd(total_hospital_medicare_days, na.rm = TRUE),
+    sd_medicaid_days = sd(total_hospital_medicaid_days, na.rm = TRUE),
+    sd_total_discharge = sd(total_hospital_discharges, na.rm = TRUE),
+    sd_medicare_discharge = sd(total_hospital_discharges, na.rm = TRUE),
+    sd_medicaid_discharge = sd(total_hospital_medicaid_discharg, na.rm = TRUE)
+  ) 
+
+```
+
+
+```{r}
+n_statistic=hospital %>%
+  group_by(year) %>%
+  summarise(
+    n_hospital_beds = sum(hospital_beds, na.rm = TRUE),
+    n_paid_employees = sum(total_hospital_employees_on_payr, na.rm = TRUE),
+    n_non_paid_employees = sum(total_hospital_non_paid_workers, na.rm = TRUE),
+    n_total_cost = sum(total_hosp_cost, na.rm = TRUE),
+    n_total_revenues = sum(total_hosp_revenue, na.rm = TRUE),
+    n_medicare_days = sum(total_hospital_medicare_days, na.rm = TRUE),
+    n_medicaid_days = sum(total_hospital_medicaid_days, na.rm = TRUE),
+    n_total_discharge = sum(total_hospital_discharges, na.rm = TRUE),
+    n_medicare_discharge = sum(total_hospital_discharges, na.rm = TRUE),
+    n_medicaid_discharge = sum(total_hospital_medicaid_discharg, na.rm = TRUE)
+  )
+
+```
+
+
+
+
+
+```{r}
+
+library(tidyr)
+
+
+n_statistic_long <- n_statistic %>%
+  pivot_longer(
+    cols = -year,
+    names_to = "Variable",
+    values_to = "N"
+  )
+
+#n_statistic_long
+
+
+names(n_statistic) <- names(sd_statistics)
+names(mean_statistics) <- names(n_statistic)
+# Combine the dataframes using rbind
+combined_df <- rbind(sd_statistics, n_statistic, mean_statistics)
+
+# Assign row names
+combined_df=as.data.frame(combined_df)
+rownames(combined_df) <- c("Sd", "Sd1", "n1", "n2", "mean1", "mean2")
+
+# Print the combined dataframe
+knitr::kable((combined_df))
+
+```
+        
+```{r}
+# Combine the dataframes using rbind and set row names
+combined_df <- rbind(sd_statistics, n_statistic, mean_statistics)
+
+# Generate unique row names
+row_names <- c("Sd", "sd", "n1", "n2", "mean1", "mean2") # Adjusted to avoid duplicates
+
+# Assign row names to the combined dataframe
+rownames(combined_df) <- row_names
+
+# Convert the "year" column to integer
+combined_df$year <- as.integer(combined_df$year)
+
+# Print the combined dataframe
+knitr::kable(combined_df)
+
+```
+
+```{r}
+# Define the data
+characteristics <- c("Hospital beds", "Number of paid Employee", "Number of non-paid Employee",
+                      "Total hospital cost", "Total hospital revenues", "Available Medicare days",
+                      "Available Medicaid days", "Total Hospital Discharge", "Medicare discharge", 
+                      "Medicaid discharge")
+N_2011 <- c(566796.0000, 1853439.150, 1199.19000, 326394348921, 344203010115, 
+            25092003.00, 7866979.000, 14238489.000, 14238489.000, 1674607.000)
+Mean_2011 <- c(376.6086, 1237.276, 39.97300, 216873322, 228706319, 16739.16, 5301.199, 9492.326, 9492.326, 1130.727)
+Std_Dev_2011 <- c(560.8998, 1615.797, 72.58805, NA, NA, 19214.29, 9207.699, 10898.600, 10898.600, 1757.158)
+
+N_2012 <- c(574620.0000, 2259049.058, 1343.09280, 327490734909, 350717045576,
+            25938976.38, 8054865.540, 14478325.000, 14478325.000, 1677082.000)
+Mean_2012 <- c(376.8000, 1491.121, 44.76976, 214748023, 229978391, 17110.14, 5366.333, 9544.051, 9544.051, 1119.547)
+Std_Dev_2012 <- c(579.8366, 1961.637, 81.29861, NA, NA, 19765.74, 9340.373, 10994.170, 10994.170, 1740.423)
+
+# Create a data frame
+df <- data.frame(Characteristics = characteristics,
+                 `2011_N` = N_2011, `2011_Mean` = Mean_2011, `2011_Std_Dev` = Std_Dev_2011,
+                 `2012_N` = N_2012, `2012_Mean` = Mean_2012, `2012_Std_Dev` = Std_Dev_2012)
+
+# Print the data frame
+knitr::kable(df)
+
+```
+
+# Exercise 2
+
+
+Descriptive statistics
+```{r}
+hospital$net_benefits=hospital$total_hosp_revenue-hospital$total_hosp_cost
+hospital$teaching_hospital=ifelse(hospital$teaching_hospital==0,"Non-Teaching","Teaching")
+
+
+mean_statistics_t <- hospital %>%
+  group_by(teaching_hospital) %>%
+  summarise(
+    mean_hospital_beds = mean(hospital_beds, na.rm = TRUE),
+    mean_paid_employees = mean(total_hospital_employees_on_payr, na.rm = TRUE),
+    mean_non_paid_employees = mean(total_hospital_non_paid_workers, na.rm = TRUE),
+    mean_interns_residents=mean(interns_and_residents, na.rm = TRUE),
+    #membership_system=mean(system_member, na.rm = TRUE),
+    mean_total_cost = mean(total_hosp_cost, na.rm = TRUE),
+    mean_total_revenues = mean(total_hosp_revenue, na.rm = TRUE),
+    mean_net_benefit=mean(net_benefits,na.rm = T),
+    mean_medicare_days = mean(total_hospital_medicare_days, na.rm = TRUE),
+    mean_medicaid_days = mean(total_hospital_medicaid_days, na.rm = TRUE),
+    mean_total_discharge = mean(total_hospital_discharges, na.rm = TRUE),
+    mean_medicare_discharge = mean(total_hospital_discharges, na.rm = TRUE),
+    mean_medicaid_discharge = mean(total_hospital_medicaid_discharg, na.rm = TRUE)
+  )
+
+
+sd_statistics_t <- hospital %>%
+  group_by(herf_cat) %>%
+  summarise(
+    sd_hospital_beds = sd(hospital_beds, na.rm = TRUE),
+    sd_paid_employees = sd(total_hospital_employees_on_payr, na.rm = TRUE),
+    sd_non_paid_employees = sd(total_hospital_non_paid_workers, na.rm = TRUE),
+    sd_interns_residents=sd(interns_and_residents, na.rm = TRUE),
+    #membership_system=sd(system_member, na.rm = TRUE),
+    sd_total_cost = sd(total_hosp_cost, na.rm = TRUE),
+    sd_total_revenues = sd(total_hosp_revenue, na.rm = TRUE),
+    sd_net_benefit=sd(net_benefits,na.rm = T),
+    sd_medicare_days = sd(total_hospital_medicare_days, na.rm = TRUE),
+    sd_medicaid_days = sd(total_hospital_medicaid_days, na.rm = TRUE),
+    sd_total_discharge = sd(total_hospital_discharges, na.rm = TRUE),
+    sd_medicare_discharge = sd(total_hospital_discharges, na.rm = TRUE),
+    sd_medicaid_discharge = sd(total_hospital_medicaid_discharg, na.rm = TRUE)
+  )
+n_statistics_t <- hospital %>%
+  group_by(herf_cat) %>%
+  summarise(
+    n_hospital_beds = sum(!is.na(hospital_beds)),
+    n_paid_employees = sum(!is.na(total_hospital_employees_on_payr)),
+    n_non_paid_employees = sum(!is.na(total_hospital_non_paid_workers)),
+    n_interns_residents = sum(!is.na(interns_and_residents)),
+    n_total_cost = sum(!is.na(total_hosp_cost)),
+    n_total_revenues = sum(!is.na(total_hosp_revenue)),
+    n_net_benefit = sum(!is.na(net_benefits)),
+    n_medicare_days = sum(!is.na(total_hospital_medicare_days)),
+    n_medicaid_days = sum(!is.na(total_hospital_medicaid_days)),
+    n_total_discharge = sum(!is.na(total_hospital_discharges)),
+    #n_medicare_discharge = sum(!is.na(total_hospital_medicare_discharges)),
+    n_medicaid_discharge = sum(!is.na(total_hospital_medicare_discharg)),
+    herf_index=sum(!is.na(herf_index))
+  )
+
+
+
+n_statistics_t <- hospital %>%
+  group_by(year) %>%
+  summarise(
+    hospital_beds=n(),
+  total_hospital_employees_on_payr=n(),
+    total_hospital_non_paid_workers=n(),
+    interns_and_residents=n(),
+    system_member=n(),
+    total_hosp_cost=n(),
+    total_hosp_revenue=n(),
+    net_benefits=n(),
+    total_hospital_medicare_days=n(),
+   total_hospital_medicaid_days=n(),
+    total_hospital_discharges=n(),
+   total_hospital_discharges=n(),
+    total_hospital_medicaid_discharg=n()
+  ) 
+
+
+hospital %>%
+  group_by(teaching_hospital,system_member)%>% summarise(Count=n())
+  
+
+```
+
+Performing t.test of exercise 1
+```{r}
+# Initialize an empty data frame to store the results
+p_values <- data.frame(
+  Statistic = character(),
+  P_Value = numeric(),
+  stringsAsFactors = FALSE
+)
+
+# List of variables to test
+
+variables <- c("hospital_beds", "total_hospital_employees_on_payr", "total_hospital_non_paid_workers","interns_and_residents", "total_hosp_cost", "total_hosp_revenue", "net_benefits","total_hospital_medicare_days", "total_hospital_medicaid_days", "total_hospital_discharges", "total_hospital_medicare_discharg", "total_hospital_medicaid_discharg")
+
+# You can use the variables as needed in your R code
+
+# Perform t-tests for each variable
+for (var in variables) {
+  var_test_result <- var.test(as.formula(paste(var, "~ teaching_hospital")), data = hospital)$p.value
+  
+  t_test_result <- ifelse(
+    var_test_result < 0.05,
+    t.test(as.formula(paste(var, "~ teaching_hospital")), data = hospital, var.equal = FALSE)$p.value,
+    t.test(as.formula(paste(var, "~ teaching_hospital")), data = hospital, var.equal = TRUE)$p.value
+  )
+  
+  # Append the result to the data frame
+  p_values <- rbind(p_values, data.frame(Statistic = var, P_Value = t_test_result))
+}
+p_values$P_Value <- round(p_values$P_Value, 4)
+
+
+
+variables <- c("hospital_beds", "total_hospital_employees_on_payr", "total_hospital_non_paid_workers", "total_hosp_cost", "total_hosp_revenue", "total_hospital_medicare_days", "total_hospital_medicaid_days", "total_hospital_discharges", "total_hospital_medicare_discharg", "total_hospital_medicaid_discharg")
+
+for (var in variables) {
+  var_test_result <- var.test(as.formula(paste(var, "~ year")), data = hospital)$p.value
+  
+  t_test_result <- ifelse(
+    var_test_result < 0.05,
+    t.test(as.formula(paste(var, "~ year")), data = hospital, var.equal = FALSE)$p.value,
+    t.test(as.formula(paste(var, "~ year")), data = hospital, var.equal = TRUE)$p.value
+  )
+  
+  # Append the result to the data frame
+  p_values <- rbind(p_values, data.frame(Statistic = var, P_Value = t_test_result))
+}
+p_values$P_Value <- round(p_values$P_Value, 4)
+
+knitr::kable(p_values)
+
+```
+
+
+Comparing hospital net-benefit which hospitals has better performance? To answer this
+question first compute the hospital net benefits with subtracting hospital costs and
+revenues and then use ttest to compare the significant differences between teaching
+and non-teaching hospitals.
+
+var.test to know if the varianccce is equal.
+```{r}
+#head(hospital[c("total_hosp_cost","total_hosp_revenue")])
+hospital$net_benefits=hospital$total_hosp_cost-hospital$total_hosp_revenue
+#head(hospital[c("total_hosp_cost","total_hosp_revenue","net_benefits")])
+var.test(net_benefits~teaching_hospital,data=hospital)
+t.test(net_benefits~teaching_hospital,data=hospital)
+```
+
+
+Use a box-plot and compare hospitals-cost and hospital-revenues between teaching
+and non-teaching hospitals.
+```{r}
+# Create a box-plot to compare hospital teaching and non-teaching hospitals
+# Assuming 'hospital' is your dataframe and it contains the columns 'total_hosp_revenue' and 'teaching_hospital'
+
+# Determine the range of the total hospital revenues to set appropriate y-axis limits
+revenue_range <- range(hospital$total_hosp_revenue, na.rm = TRUE)
+
+# Set the ylim to be slightly larger than the range of the revenues to provide some space at the bottom
+ylim_range <- c(0, revenue_range[2] * 1.1)
+
+# Plot the boxplot with adjusted ylim
+options(scipen = 999)
+
+
+boxplot(total_hosp_revenue ~ teaching_hospital, data = hospital,
+        xlab = "Teaching Hospital", ylab = "Total Hospital Revenue",
+        col = c("gray", "red"), ylim = ylim_range)
+
+```
+
+
+# Exercise 3
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+hospital$herf_cat=as.factor(hospital$herf_cat)
+hospital$herf_cat <- ifelse(hospital$herf_cat == 0, "Low",
+                       ifelse(hospital$herf_cat == 1, "Moderate", "High"))
+
+# Summarize data by herf_cat
+summary_statistics <- hospital %>%
+  
+  group_by(herf_cat) %>%
+  
+  summarise(
+    Mean_hospital_beds = mean(hospital_beds, na.rm = TRUE),
+    Mean_paid_employees = mean(total_hospital_employees_on_payr, na.rm = TRUE),
+    Mean_non_paid_employees = mean(total_hospital_non_paid_workers, na.rm = TRUE),
+    Mean_internes_residents = mean(interns_and_residents, na.rm = TRUE),
+    Mean_system_membership = mean(system_member, na.rm = TRUE),
+    Mean_total_hosp_cost = mean(total_hosp_cost, na.rm = TRUE),
+    Mean_total_revenues = mean(total_hosp_revenue, na.rm = TRUE),
+    Mean_net_benefit = mean(net_benefits - total_hosp_cost, na.rm = TRUE),
+    Mean_medicare_days = mean(total_hospital_medicare_days, na.rm = TRUE),
+    Mean_medicaid_days = mean(total_hospital_medicaid_days, na.rm = TRUE),
+    Mean_total_discharge = mean(total_hospital_discharges, na.rm = TRUE),
+    Mean_medicare_discharge = mean(total_hospital_medicare_discharg, na.rm = TRUE),
+    Mean_medicaid_discharge = mean(total_hospital_medicaid_discharg, na.rm = TRUE),
+   Mean_hhi = mean(herf_index, na.rm = TRUE)
+  )
+
+knitr::kable(summary_statistics)
+
+
+```
+
+```{r}
+sd_href_statistics <- hospital %>%
+  
+  group_by(herf_cat) %>%
+  
+  summarise(
+    sd_hospital_beds = sd(hospital_beds, na.rm = TRUE),
+    sd_paid_employees = sd(total_hospital_employees_on_payr, na.rm = TRUE),
+    sd_non_paid_employees = sd(total_hospital_non_paid_workers, na.rm = TRUE),
+    sd_internes_residents = sd(interns_and_residents, na.rm = TRUE),
+    sd_system_membership = sd(system_member, na.rm = TRUE),
+    sd_total_hosp_cost = sd(total_hosp_cost, na.rm = TRUE),
+    sd_total_revenues = sd(total_hosp_revenue, na.rm = TRUE),
+    sd_net_benefit = sd(net_benefits - total_hosp_cost, na.rm = TRUE),
+    sd_medicare_days = sd(total_hospital_medicare_days, na.rm = TRUE),
+    sd_medicaid_days = sd(total_hospital_medicaid_days, na.rm = TRUE),
+    sd_total_discharge = sd(total_hospital_discharges, na.rm = TRUE),
+    sd_medicare_discharge = sd(total_hospital_medicare_discharg, na.rm = TRUE),
+    sd_medicaid_discharge = sd(total_hospital_medicaid_discharg, na.rm = TRUE),
+   sd_hhi = sd(herf_index, na.rm = TRUE)
+  )
+```
+
+
+
+
+```{r}
+
+n_href_statistics <- hospital %>%
+  
+  group_by(herf_cat) %>%
+  
+  summarise(
+    n_hospital_beds = sum(hospital_beds, na.rm = TRUE),
+    n_paid_employees = sum(total_hospital_employees_on_payr, na.rm = TRUE),
+    n_non_paid_employees = sum(total_hospital_non_paid_workers, na.rm = TRUE),
+    n_internes_residents = sum(interns_and_residents, na.rm = TRUE),
+    n_system_membership = sum(system_member, na.rm = TRUE),
+    n_total_hosp_cost = sum(total_hosp_cost, na.rm = TRUE),
+    n_total_revenues = sum(total_hosp_revenue, na.rm = TRUE),
+    n_net_benefit = sum(net_benefits - total_hosp_cost, na.rm = TRUE),
+    n_medicare_days = sum(total_hospital_medicare_days, na.rm = TRUE),
+    n_medicaid_days = sum(total_hospital_medicaid_days, na.rm = TRUE),
+    n_total_discharge = sum(total_hospital_discharges, na.rm = TRUE),
+    n_medicare_discharge = sum(total_hospital_medicare_discharg, na.rm = TRUE),
+    n_medicaid_discharge = sum(total_hospital_medicaid_discharg, na.rm = TRUE),
+   n_hhi = sum(herf_index, na.rm = TRUE)
+  )
+
+
+```
+
+
+
+
+## One way Anova test
+```{r}
+boxplot(hospital_beds~herf_cat,data=hospital)
+# Load necessary libraries
+library(dplyr)
+
+# Function to perform ANOVA or Welch's ANOVA based on the result of var.test()
+perform_anova <- function(var, group_var, data) {
+  var_test_result <- bartlett.test(var ~ group_var, data = data)
+  if (var_test_result$p.value < 0.05) {
+    # Perform Welch's ANOVA
+    welch_anova_result <- oneway.test(var ~ group_var, data = data)
+    return(welch_anova_result$p.value)
+  } else {
+    # Perform regular ANOVA
+    aov_result <- summary(aov(var ~ group_var, data = data))
+    return(aov_result[[1]]$`Pr(>F)`[1])
+  }
+}
+
+
+perform_anova <- function(var, group_var, data) {
+  var_test_result <- bartlett.test(var ~ group_var, data = data)
+ 
+    # Perform regular ANOVA
+    aov_result <- summary(aov(var ~ group_var, data = data))
+    return(aov_result[[1]]$`Pr(>F)`[1])
+  
+}
+perform_anova(hospital$hospital_beds,hospital$herf_cat,data = hospital)
+oneway.test(hospital_beds~herf_cat,data = hospital)
+summary(aov(hospital_beds~herf_cat,data = hospital))
+# Remove rows with missing values
+hospital_clean <- na.omit(hospital)
+
+# Apply ANOVA to each column (except herf_cat) against herf_cat
+#apply(hospital_clean[, -which(names(hospital_clean) == "herf_cat")], 2, function(x) {
+  #anova(lm(x ~ herf_cat, data = hospital_clean))
+#})
+
+
+p_values <- hospital %>%
+  summarise(
+    p_value_hospital_beds = perform_anova(hospital_beds, herf_cat, hospital),
+    p_value_paid_employees = perform_anova(total_hospital_employees_on_payr, herf_cat, hospital),
+    p_value_non_paid_employees = perform_anova(total_hospital_non_paid_workers, herf_cat, hospital),
+    p_value_internes_residents = perform_anova(interns_and_residents, herf_cat, hospital),
+    p_value_system_membership = perform_anova(system_member, herf_cat, hospital),
+    p_value_total_hosp_cost = perform_anova(total_hosp_cost, herf_cat, hospital),
+    p_value_total_revenues = perform_anova(total_hosp_revenue, herf_cat, hospital),
+    #p_value_net_benefit = perform_anova(net_benefits - total_hosp_cost, herf_cat, hospital),
+    p_value_medicare_days = perform_anova(total_hospital_medicare_days, herf_cat, hospital),
+    p_value_medicaid_days = perform_anova(total_hospital_medicaid_days, herf_cat, hospital),
+    p_value_total_discharge = perform_anova(total_hospital_discharges, herf_cat, hospital),
+    p_value_medicare_discharge = perform_anova(total_hospital_medicare_discharg, herf_cat, hospital),
+    p_value_medicaid_discharge = perform_anova(total_hospital_medicaid_discharg, herf_cat, hospital),
+    p_value_hhi = perform_anova(herf_index, herf_cat, hospital)
+  )
+
+knitr::kable(p_values)
+```
+
+
+## Density Curves
+
+```{r}
+hospital %>%group_by(herf_cat) %>%   ggplot(aes(x=total_hosp_cost))+geom_density()
+
+# Load necessary libraries
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+# Combine data into long format
+long_hospital <- hospital %>%
+  select(herf_cat, total_hosp_cost, total_hosp_revenue) %>%
+  pivot_longer(cols = c(total_hosp_cost, total_hosp_revenue),
+               names_to = "variable",
+               values_to = "value")
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(scales)
+
+long_hospital <- hospital %>%
+  select(herf_cat, total_hosp_cost, total_hosp_revenue) %>%
+  pivot_longer(cols = c(total_hosp_cost, total_hosp_revenue),
+               names_to = "variable",
+               values_to = "value")
+
+ggplot(long_hospital, aes(x = value, y = ..count..,color=variable)) +
+  geom_density(alpha = 0.3, position = "identity", aes(y = after_stat(density)), bw = 0.1) + # Adjust the bandwidth here
+  facet_wrap(~ herf_cat) +
+  labs(title = "Density Plot of Hospital Costs and Revenues by Market Competitiveness",
+       x = "Value",
+       y = "Density",
+       fill = "Variable") +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.0001)) +
+  theme_minimal() +
+  scale_x_discrete(labels = c("High" = "High", "Low" = "Low", "Moderate" = "Moderate"))
+
+
+```
+
+
+
+
+# Linear Regression
+
+```{r}
+hospital$own=as.factor(as.character(hospital$own))
+model=lm(net_benefits~total_hospital_beds+own,data=hospital)
+
+summary(model)
+```
+
+
+```{r}
+hospital$system_member=as.factor(as.character(hospital$system_member))
+model2=lm(net_benefits~total_hospital_beds+own+system_member,data=hospital)
+summary(model2)
+```
+
+```{r}
+hospital$medicare_dratio=hospital$total_hospital_medicare_discharg/hospital$total_hospital_discharges
+hospital$medicaid_dratio=hospital$total_hospital_medicaid_discharg/hospital$total_hospital_discharges
+model3=lm(lm(net_benefits~total_hospital_beds+own+system_member+medicare_dratio+medicaid_dratio,data=hospital))
+summary(model3)
+```
+
+```{r}
+summary(aov(medicaid_dratio~herf_cat,data=hospital))
+TukeyHSD(aov(medicaid_dratio~herf_cat,data=hospital))
+summary(aov(medicare_dratio~herf_cat,data=hospital))
+TukeyHSD(aov(medicare_dratio~herf_cat,data=hospital))
+summary(aov(net_benefits~herf_cat,data=hospital))
+TukeyHSD(aov(net_benefits~herf_cat,data=hospital))
+```
+
+
+
+```{r}
+boxplot(medicaid_dratio~herf_cat,data=hospital,main="Boxplot ofmeicaid Ratio")
+boxplot(medicare_dratio~herf_cat,data=hospital,main="Boxplot of Medicare Ratio")
+```
+
+```{r, echo=FALSE, results='asis'}
+library(knitr)
+
+kable(data.frame(
+  Category = c("Low-High", "Moderate-High", "Moderate-Low"),
+  Difference = c(0.0069813532, 0.0075305776, 0.0005492244),
+  Lower = c(-0.0092722013, -0.0009765952, -0.0158119860),
+  Upper = c(0.02323491, 0.01603775, 0.01691043),
+  p.adj = c(0.5723549, 0.0950725, 0.9965899)
+), digits = c(0, 4, 4, 4, 4), caption = "Tukey Multiple Comparisons of Means")
+```
